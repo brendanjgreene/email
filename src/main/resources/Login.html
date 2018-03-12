@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title> Inbox</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+</head>
+<body onload="inbox.forEach(myFunction)">
+<nav class="navbar navbar-default bg-dark navbar-dark">
+    <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="http://localhost:8081/logout">#[sessionVars.uname]</a>
+            </div>
+            <a href="http://localhost:8081/logout"></a>
+   </div>
+</nav>
+<div class="container">
+        <div class="panel panel-default">
+            <div class="panel-heading"><h1>Login Form</h1></div>
+            <div class="panel-body">
+                <form action="http://localhost:8081" name="loginForm" method="post">
+                    <div class="form-group">
+                        <label>User Name:</label>
+                        <input class="form-control" name="user_name" >
+                    </div>
+                    <div class="form-group">
+                        <label>Password:</label>
+                        <input class="form-control" name="password" >
+                    </div>
+                    
+                    
+                    <button type="submit" class="btn btn-primary btn-lg" value="Submit">Login</button>
+<div>#[payload]</div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

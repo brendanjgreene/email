@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd">
+    <http:listener-config name="HTTP_Listener_Configuration" host="0.0.0.0" port="8081" doc:name="HTTP Listener Configuration"/>
+    <db:mysql-config name="MySQL_Configuration" host="localhost" port="3306" user="root" database="email" doc:name="MySQL Configuration"/>
+    <flow name="emailFlow">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/" doc:name="HTTP"/>
+        <custom-transformer class="email.LoginProcess" doc:name="Java"/>
+        <set-variable variableName="username" value="#[flowVars.uname]" doc:name="username"/>
+        <set-variable variableName="password" value="#[flowVars.pwd]" doc:name="password"/>
+        <set-variable variableName="query" value="SELECT * FROM users WHERE user_name = '#[flowVars.username]' AND password = '#[flowVars.password]';" doc:name="query"/>
+        <db:select config-ref="MySQL_Configuration" doc:name="Login">
+            <db:dynamic-query><![CDATA[#[flowVars.query]]]></db:dynamic-query>
+        </db:select>
+        <json:object-to-json-transformer doc:name="Object to JSON"/>
+        <custom-transformer class="email.CheckLogin" doc:name="Java"/>
+        <choice doc:name="Choice">
+            <when expression="#[sessionVars.uname!=null]">
+                <flow-ref name="InboxFlow" doc:name="InboxFlow"/>
+            </when>
+            <otherwise>
+                <logger message="Invalid username and password" level="INFO" doc:name="Logger"/>
+                <set-payload value="Invalid Username or Password Try Again" doc:name="Set Payload"/>
+                <flow-ref name="Login" doc:name="Login"/>
+            </otherwise>
+        </choice>
+    </flow>
+    <flow name="Logout">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/logout" doc:name="HTTP"/>
+        <remove-session-variable variableName="uname" doc:name="Session Variable"/>
+        <flow-ref name="Login" doc:name="Login"/>
+    </flow>
+    <flow name="Login">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/login" doc:name="HTTP"/>
+        <logger message="#[payload]" level="INFO" doc:name="Logger"/>
+        <parse-template location="login.html" doc:name="Parse Template"/>
+        <set-property propertyName="content-type" value="text/html" doc:name="Property"/>
+    </flow>
+    <flow name="InboxFlow">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/inbox" allowedMethods="get" doc:name="HTTP"/>
+        <set-variable variableName="inboxQuery" value="SELECT * FROM EMAILS WHERE EMAIL_TO = '#[sessionVars.uname]';" doc:name="inbox Query"/>
+        <db:select config-ref="MySQL_Configuration" doc:name="Inbox">
+            <db:dynamic-query><![CDATA[#[flowVars.inboxQuery]]]></db:dynamic-query>
+        </db:select>
+        <json:object-to-json-transformer doc:name="Object to JSON"/>
+        <parse-template location="inbox.html" doc:name="Parse Template"/>
+        <set-property propertyName="content-type" value="text/html" encoding="ISO-8859-6" doc:name="Property"/>
+    </flow>
+</mule>

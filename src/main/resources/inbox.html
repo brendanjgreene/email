@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title> Inbox</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+</head>
+<body onload="inbox.forEach(myFunction)">
+<nav class="navbar navbar-default bg-dark navbar-dark">
+    <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="http://localhost:8081/login">#[sessionVars.uname]</a>
+            </div>
+            <a href="http://localhost:8081/logout">Logout</a>
+   </div>
+</nav>
+    <div class="container">
+    <div class="panel panel-default">
+            <div class="panel-heading"><h1>Inbox</h1></div>
+            <div class="panel-body">
+        
+<table  id="accounts" class="table table-striped">
+                <tr>
+                    <th>From</th>
+                    <th>Subject</th>
+                    <th>Body</th>
+                    <th>Date</th>
+                </tr>
+                    
+                
+</table>
+</div>
+</div>
+        
+        
+    </div>
+</body>
+<script>
+insertTable = document.getElementById("accounts");
+var inbox = #[payload];
+
+function myFunction(email, index) {
+	insertTable.innerHTML = insertTable.innerHTML + 
+    "<tr><td>" + email.email_from + "</td>" +
+    "<td>" + email.email_subject + "</td>" +
+    "<td>" + email.body + "</td>" +
+    "<td>" + email.date + "</td></tr>"; 
+}
+</script>
+
+</body>
+</html>
